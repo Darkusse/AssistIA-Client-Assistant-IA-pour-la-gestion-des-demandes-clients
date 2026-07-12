@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AssistIA Client — Démo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-soft:#3A4356;
+    --paper:#F6F5F1;
+    --paper-card:#FFFFFF;
+    --line:#E4E2DA;
+    --coral:#E85D4C;
+    --coral-bg:#FBE9E6;
+    --teal:#2F9E8F;
+    --teal-bg:#E4F3F1;
+    --amber:#C97F1E;
+    --amber-bg:#F8ECD8;
+    --muted:#8A8578;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  h1,h2,h3,.brand{font-family:'Fraunces',serif;}
+
+  .app{display:flex;min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{
+    width:230px;
+    background:var(--ink);
+    color:#EFEEE9;
+    padding:28px 20px;
+    flex-shrink:0;
+  }
+  .brand{font-size:21px;font-weight:600;margin:0 0 2px;letter-spacing:-0.01em;}
+  .brand-sub{font-size:12px;color:#9099AC;margin:0 0 36px;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 10px;border-radius:7px;
+    font-size:14px;color:#C7CBD6;
+    margin-bottom:2px;cursor:pointer;
+  }
+  .nav-item.active{background:rgba(255,255,255,0.08);color:#fff;}
+  .nav-item:hover{color:#fff;}
+  .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+  .sidebar-foot{
+    margin-top:48px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);
+    font-size:12px;color:#8189A0;line-height:1.6;
+  }
+
+  /* Main */
+  .main{flex:1;padding:36px 44px;max-width:1180px;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;}
+  .topbar h1{font-size:26px;font-weight:500;margin:0 0 4px;}
+  .topbar p{margin:0;color:var(--muted);font-size:14px;}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;}
+  .stat-card{
+    background:var(--paper-card);border:1px solid var(--line);
+    border-radius:12px;padding:18px 20px;
+  }
+  .stat-label{font-size:12.5px;color:var(--muted);margin:0 0 8px;}
+  .stat-value{font-size:26px;font-family:'Fraunces',serif;font-weight:500;margin:0;}
+  .stat-value.coral{color:var(--coral);}
+  .stat-value.teal{color:var(--teal);}
+
+  .columns{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:start;}
+
+  .panel-title{
+    font-size:13px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--muted);margin:0 0 12px;font-weight:600;
+  }
+
+  .filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .filter-btn{
+    font-family:'Inter',sans-serif;font-size:12.5px;
+    padding:6px 12px;border-radius:20px;border:1px solid var(--line);
+    background:var(--paper-card);color:var(--ink-soft);cursor:pointer;
+  }
+  .filter-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  .ticket-list{display:flex;flex-direction:column;gap:9px;}
+  .ticket{
+    background:var(--paper-card);border:1px solid var(--line);border-radius:11px;
+    padding:14px 16px;cursor:pointer;transition:border-color .15s;
+  }
+  .ticket:hover{border-color:#C6C2B4;}
+  .ticket.selected{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink);}
+  .ticket-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+  .ticket-name{font-size:14px;font-weight:600;}
+  .badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;}
+  .badge.urgent{background:var(--coral-bg);color:var(--coral);}
+  .badge.normal{background:var(--amber-bg);color:var(--amber);}
+  .badge.faible{background:var(--teal-bg);color:var(--teal);}
+  .ticket-msg{font-size:13.5px;color:var(--ink-soft);margin:0 0 6px;line-height:1.4;}
+  .ticket-meta{font-size:11.5px;color:var(--muted);}
+
+  /* AI panel */
+  .ai-panel{
+    background:var(--paper-card);border:1px solid var(--line);border-radius:14px;
+    padding:20px 22px;position:sticky;top:36px;
+  }
+  .ai-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;color:var(--teal);background:var(--teal-bg);
+    padding:4px 10px;border-radius:20px;margin-bottom:14px;font-weight:600;
+  }
+  .ai-for{font-size:12px;color:var(--muted);margin:0 0 4px;}
+  .ai-name{font-size:15px;font-weight:600;margin:0 0 14px;}
+  .ai-reply{
+    font-size:14px;line-height:1.65;color:var(--ink);
+    background:var(--paper);border-radius:9px;padding:14px 16px;
+    margin:0 0 16px;min-height:110px;border:1px solid var(--line);
+  }
+  .ai-actions{display:flex;gap:9px;}
+  .btn{
+    font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+    padding:9px 16px;border-radius:8px;border:1px solid var(--line);
+    background:var(--paper-card);cursor:pointer;flex:1;
+  }
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .btn:hover{border-color:#C6C2B4;}
+  .btn.primary:hover{opacity:0.92;border-color:var(--ink);}
+
+  .sent-flash{
+    font-size:13px;color:var(--teal);margin-top:10px;display:none;font-weight:600;
+  }
+
+  @media (max-width:880px){
+    .app{flex-direction:column;}
+    .sidebar{width:100%;padding:18px 20px;}
+    .main{padding:24px 20px;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .columns{grid-template-columns:1fr;}
+    .ai-panel{position:static;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <p class="brand">AssistIA Client</p>
+    <p class="brand-sub">Gestion des demandes</p>
+
+    <div class="nav-item active"><span class="dot"></span> Tableau de bord</div>
+    <div class="nav-item"><span class="dot"></span> Tous les tickets</div>
+    <div class="nav-item"><span class="dot"></span> Base de connaissances</div>
+    <div class="nav-item"><span class="dot"></span> Statistiques</div>
+    <div class="nav-item"><span class="dot"></span> Paramètres</div>
+
+    <div class="sidebar-foot">
+      Démo — les réponses IA sont pré-écrites à des fins de présentation. Aucune donnée n'est envoyée.
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Tableau de bord</h1>
+        <p id="dateline"></p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <p class="stat-label">Tickets ouverts</p>
+        <p class="stat-value" id="stat-open">—</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Urgents</p>
+        <p class="stat-value coral" id="stat-urgent">—</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Temps moyen de réponse</p>
+        <p class="stat-value">2h 15</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Résolus (7 jours)</p>
+        <p class="stat-value teal">89</p>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div>
+        <p class="panel-title">File des tickets</p>
+        <div class="filters" id="filters"></div>
+        <div class="ticket-list" id="ticket-list"></div>
+      </div>
+
+      <div>
+        <p class="panel-title">Réponse suggérée par l'IA</p>
+        <div class="ai-panel">
+          <span class="ai-tag">● généré par l'IA</span>
+          <p class="ai-for" id="ai-for">Sélectionnez un ticket</p>
+          <p class="ai-name" id="ai-name"></p>
+          <div class="ai-reply" id="ai-reply">Cliquez sur un ticket à gauche pour voir la réponse suggérée.</div>
+          <div class="ai-actions">
+            <button class="btn" onclick="editReply()">Modifier</button>
+            <button class="btn primary" onclick="sendReply()">Envoyer</button>
+          </div>
+          <p class="sent-flash" id="sent-flash">✓ Réponse envoyée au client</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const tickets = [
+  {id:1, name:"Sophie Martin", priority:"urgent", category:"Livraison", sentiment:"mécontent",
+   msg:"Colis non reçu depuis 10 jours, demande de remboursement.",
+   reply:"Bonjour Sophie,\n\nJe suis vraiment désolé pour ce retard. J'ai vérifié votre commande #48213 et je lance un remboursement immédiat.\n\nVous recevrez la confirmation sous 24h. N'hésitez pas si vous avez d'autres questions.\n\nCordialement,\nL'équipe support"},
+  {id:2, name:"Karim Benali", priority:"normal", category:"Facturation", sentiment:"neutre",
+   msg:"Question sur le montant facturé ce mois-ci, plus élevé que d'habitude.",
+   reply:"Bonjour Karim,\n\nMerci de votre message. La différence vient de l'ajout de l'option stockage supplémentaire activée le 3 du mois. Je vous joins le détail de la facture pour clarté.\n\nBonne journée,\nL'équipe support"},
+  {id:3, name:"Léa Dubois", priority:"faible", category:"Technique", sentiment:"neutre",
+   msg:"Comment changer mon mot de passe ?",
+   reply:"Bonjour Léa,\n\nVous pouvez changer votre mot de passe dans Paramètres > Sécurité > Modifier le mot de passe. Un lien de confirmation vous sera envoyé par email.\n\nBelle journée,\nL'équipe support"},
+  {id:4, name:"Thomas Roy", priority:"urgent", category:"Technique", sentiment:"mécontent",
+   msg:"Impossible de me connecter depuis ce matin, c'est urgent pour mon travail.",
+   reply:"Bonjour Thomas,\n\nJe comprends l'urgence. Nous avons identifié un souci ponctuel sur l'authentification, déjà résolu de notre côté. Pouvez-vous réessayer et me confirmer si cela fonctionne ?\n\nMerci de votre patience,\nL'équipe support"},
+  {id:5, name:"Nadia Fernandes", priority:"normal", category:"Réclamation", sentiment:"mécontent",
+   msg:"Le produit reçu ne correspond pas à la description du site.",
+   reply:"Bonjour Nadia,\n\nJe suis désolé pour cette différence. Pourriez-vous m'envoyer une photo du produit reçu ? Nous organiserons un échange ou un remboursement selon votre préférence.\n\nCordialement,\nL'équipe support"},
+  {id:6, name:"Julien Petit", priority:"faible", category:"Facturation", sentiment:"satisfait",
+   msg:"Merci pour la réactivité sur ma dernière demande, juste une question sur la TVA.",
+   reply:"Bonjour Julien,\n\nMerci pour votre retour, ça nous fait plaisir ! La TVA appliquée est de 20%, incluse dans le montant affiché sur votre facture.\n\nBonne journée,\nL'équipe support"}
+];
+
+let activeFilter = "tous";
+let selectedId = null;
+
+const filters = ["tous","urgent","normal","faible"];
+const filterLabels = {tous:"Tous", urgent:"Urgent", normal:"Normal", faible:"Faible"};
+
+function renderFilters(){
+  const el = document.getElementById('filters');
+  el.innerHTML = filters.map(f =>
+    `<button class="filter-btn ${f===activeFilter?'active':''}" onclick="setFilter('${f}')">${filterLabels[f]}</button>`
+  ).join('');
+}
+
+function setFilter(f){
+  activeFilter = f;
+  renderFilters();
+  renderTickets();
+}
+
+function renderTickets(){
+  const list = tickets.filter(t => activeFilter==="tous" || t.priority===activeFilter);
+  const el = document.getElementById('ticket-list');
+  el.innerHTML = list.map(t => `
+    <div class="ticket ${t.id===selectedId?'selected':''}" onclick="selectTicket(${t.id})">
+      <div class="ticket-top">
+        <span class="ticket-name">${t.name}</span>
+        <span class="badge ${t.priority}">${filterLabels[t.priority]}</span>
+      </div>
+      <p class="ticket-msg">${t.msg}</p>
+      <span class="ticket-meta">${t.category} · ${t.sentiment}</span>
+    </div>
+  `).join('');
+  updateStats();
+}
+
+function updateStats(){
+  document.getElementById('stat-open').textContent = tickets.length;
+  document.getElementById('stat-urgent').textContent = tickets.filter(t=>t.priority==='urgent').length;
+}
+
+function selectTicket(id){
+  selectedId = id;
+  const t = tickets.find(x=>x.id===id);
+  document.getElementById('ai-for').textContent = `Pour : ${t.name} · ${t.category}`;
+  document.getElementById('ai-name').textContent = "Brouillon généré automatiquement";
+  document.getElementById('ai-reply').textContent = t.reply;
+  document.getElementById('ai-reply').setAttribute('contenteditable','false');
+  document.getElementById('sent-flash').style.display = 'none';
+  renderTickets();
+}
+
+function editReply(){
+  const el = document.getElementById('ai-reply');
+  el.setAttribute('contenteditable','true');
+  el.focus();
+}
+
+function sendReply(){
+  if(selectedId===null) return;
+  document.getElementById('sent-flash').style.display = 'block';
+}
+
+document.getElementById('dateline').textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+
+renderFilters();
+renderTickets();
+selectTicket(1);
+</script>
+
+</body>
+</html>
